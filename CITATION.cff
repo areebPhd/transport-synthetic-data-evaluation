@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this research software, cite the associated PhD thesis. Bibliographic metadata is pending final deposit."
+title: "SynthEval: transport-oriented evaluation of synthetic movement tables"
+type: software
+version: 0.2.1
+date-released: 2026-10-25
+authors:
+  - family-names: Alshoshan
+    given-names: Areeb
+abstract: >-
+  A reference implementation for use-conditioned evaluation of synthetic
+  transport data across held-out fidelity, downstream utility, empirical
+  privacy-risk diagnostics, transport alignment, applicability and provenance.
+license: MIT
+repository-code: "https://github.com/areebPhd/transport-synthetic-data-evaluation"

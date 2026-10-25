@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "anpr-syntheval"
+version = "0.2.1"
+description = "Reference implementation of the transport-oriented SynthEval framework"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Areeb Alshoshan"}]
+dependencies = [
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "pyarrow>=12",
+  "PyYAML>=6",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=9,<10"]
+
+[project.scripts]
+anpr-syntheval = "anpr_syntheval.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[project.urls]
+Repository = "https://github.com/areebPhd/transport-synthetic-data-evaluation"
+Issues = "https://github.com/areebPhd/transport-synthetic-data-evaluation/issues"
