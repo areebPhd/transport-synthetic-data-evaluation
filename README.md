@@ -36,7 +36,7 @@ for the checks performed for this public release.
 From the repository root:
 
 ```bash
-./reproduce.sh
+bash reproduce.sh
 ```
 
 This command regenerates three small, deterministic, identifier-free roles,
