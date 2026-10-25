@@ -1,0 +1,120 @@
+schema_version: "1.0.0"
+name: public_nyc_tlc_zone_trip
+description: Identifier-free projection of public NYC TLC yellow-taxi trips.
+continuous_features:
+  - duration_seconds
+  - route_distance_m
+  - derived_average_speed_kph
+count_features: []
+categorical_features:
+  - origin_zone
+  - destination_zone
+  - time_of_day
+  - distance_band
+  - payment_type
+ordinal_features:
+  day_of_week:
+    ordered_values: [0, 1, 2, 3, 4, 5, 6]
+  hour_of_day:
+    ordered_values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+binary_features: {}
+temporal_features:
+  day_of_week: day_of_week
+  hour_of_day: hour_of_day
+  coarse_period: time_of_day
+cyclical_temporal_features:
+  hour_of_day:
+    period: 24
+  day_of_week:
+    period: 7
+transport_fields:
+  origin_camera: origin_zone
+  destination_camera: destination_zone
+  od_pair:
+    components: [origin_zone, destination_zone]
+    separator: "->"
+  distance: route_distance_m
+  duration: duration_seconds
+  derived_speed: derived_average_speed_kph
+  distance_unit: metre
+  duration_unit: second
+  speed_unit: kilometre_per_hour
+  working_period:
+    hour_feature: hour_of_day
+    start_inclusive: 7
+    end_exclusive: 19
+target_variables:
+  - distance_band
+required_columns:
+  - duration_seconds
+  - route_distance_m
+  - derived_average_speed_kph
+  - origin_zone
+  - destination_zone
+  - time_of_day
+  - distance_band
+  - payment_type
+  - day_of_week
+  - hour_of_day
+optional_columns: []
+prohibited_identifiers:
+  exact_names:
+    - tpep_pickup_datetime
+    - tpep_dropoff_datetime
+    - driver_id
+    - vehicle_id
+    - hack_license
+  case_insensitive_patterns:
+    - "(^|_)timestamp($|_)"
+    - "(^|_)vehicle(_?id)?($|_)"
+    - "(^|_)driver(_?id)?($|_)"
+grouping_variables: []
+overlap_audit_columns: []
+rare_categories:
+  maximum_reference_frequency: 0.01
+  minimum_reference_count: 2
+  release_minimum_cell_count: 10
+valid_physical_ranges:
+  duration_seconds:
+    minimum: 0.0
+    minimum_inclusive: false
+    maximum: 10800.0
+    maximum_inclusive: true
+  route_distance_m:
+    minimum: 0.0
+    minimum_inclusive: false
+    maximum: 160934.0
+    maximum_inclusive: true
+  derived_average_speed_kph:
+    minimum: 0.0
+    minimum_inclusive: false
+    maximum: 160.0
+    maximum_inclusive: true
+  day_of_week:
+    minimum: 0
+    minimum_inclusive: true
+    maximum: 6
+    maximum_inclusive: true
+  hour_of_day:
+    minimum: 0
+    minimum_inclusive: true
+    maximum: 23
+    maximum_inclusive: true
+physical_consistency:
+  speed_formula: "3.6 * route_distance_m / duration_seconds"
+  relative_tolerance: 0.000001
+  impossible_speed_threshold_kph: 160.0
+leakage_rules:
+  derived_average_speed_kph:
+    direct_components: [route_distance_m, duration_seconds]
+    reason: Derived speed is a deterministic function of distance and duration.
+  time_of_day:
+    direct_components: [hour_of_day]
+    reason: Coarse period is derived directly from hour.
+  distance_band:
+    direct_components: [route_distance_m]
+    reason: Distance band is derived directly from route distance.
+privacy_distance_features:
+  continuous: [duration_seconds, route_distance_m, derived_average_speed_kph]
+  categorical: [origin_zone, destination_zone, day_of_week, hour_of_day]
+rare_combination_features: [origin_zone, destination_zone, hour_of_day]
