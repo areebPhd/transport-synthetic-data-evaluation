@@ -1,0 +1,195 @@
+schema_version: "1.0.0"
+name: anpr_plausible_inter_camera_leg
+description: >-
+  Identifier-free evaluation projection for plausible observed inter-camera
+  journey legs. Exact timestamps and internal sequence keys are prohibited.
+
+continuous_features:
+  - duration_seconds
+  - route_distance_m
+  - derived_average_speed_kph
+  - origin_confidence
+  - destination_confidence
+  - route_average_kph
+  - direction_compatibility
+
+count_features: []
+
+categorical_features:
+  - origin_camera
+  - destination_camera
+  - time_of_day
+  - predominant_road_class
+
+ordinal_features:
+  day_of_week:
+    ordered_values: [0, 1, 2, 3, 4, 5, 6]
+  hour_of_day:
+    ordered_values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+
+binary_features:
+  cross_week:
+    allowed_values: [false, true]
+
+temporal_features:
+  day_of_week: day_of_week
+  hour_of_day: hour_of_day
+  coarse_period: time_of_day
+
+cyclical_temporal_features:
+  hour_of_day:
+    period: 24
+  day_of_week:
+    period: 7
+
+transport_fields:
+  origin_camera: origin_camera
+  destination_camera: destination_camera
+  od_pair:
+    components: [origin_camera, destination_camera]
+    separator: "->"
+  distance: route_distance_m
+  duration: duration_seconds
+  derived_speed: derived_average_speed_kph
+  distance_unit: metre
+  duration_unit: second
+  speed_unit: kilometre_per_hour
+  working_period:
+    hour_feature: hour_of_day
+    start_inclusive: 7
+    end_exclusive: 19
+
+target_variables:
+  - predominant_road_class
+  - time_of_day
+
+required_columns:
+  - duration_seconds
+  - route_distance_m
+  - derived_average_speed_kph
+  - origin_camera
+  - destination_camera
+  - day_of_week
+  - hour_of_day
+  - time_of_day
+  - predominant_road_class
+
+optional_columns:
+  - origin_confidence
+  - destination_confidence
+  - route_average_kph
+  - direction_compatibility
+  - cross_week
+
+prohibited_identifiers:
+  exact_names:
+    - registration
+    - registration_number
+    - number_plate
+    - vrm
+    - vehicle
+    - vehicle_id
+    - vehicle_token
+    - pseudonymous_vehicle_token
+    - journey_token
+    - journey_id
+    - sequence_key
+    - origin_timestamp
+    - destination_timestamp
+    - timestamp
+    - observed_at
+  case_insensitive_patterns:
+    - "(^|_)registration(_|$)"
+    - "(^|_)number_?plate(_|$)"
+    - "(^|_)vehicle(_?id|_?token)?($|_)"
+    - "(^|_)journey(_?id|_?token)?($|_)"
+    - "(^|_)sequence_?key($|_)"
+    - "(^|_)timestamp($|_)"
+
+grouping_variables: []
+overlap_audit_columns: []
+
+rare_categories:
+  maximum_reference_frequency: 0.01
+  minimum_reference_count: 2
+  release_minimum_cell_count: 10
+
+valid_physical_ranges:
+  duration_seconds:
+    minimum: 0.0
+    minimum_inclusive: false
+    maximum: 3600.0
+    maximum_inclusive: true
+  route_distance_m:
+    minimum: 0.0
+    minimum_inclusive: false
+    maximum: 100000.0
+    maximum_inclusive: true
+  derived_average_speed_kph:
+    minimum: 0.0
+    minimum_inclusive: true
+    maximum: 130.0
+    maximum_inclusive: true
+  origin_confidence:
+    minimum: 0.0
+    minimum_inclusive: true
+    maximum: 100.0
+    maximum_inclusive: true
+  destination_confidence:
+    minimum: 0.0
+    minimum_inclusive: true
+    maximum: 100.0
+    maximum_inclusive: true
+  route_average_kph:
+    minimum: 0.0
+    minimum_inclusive: false
+    maximum: 130.0
+    maximum_inclusive: true
+  direction_compatibility:
+    minimum: 0.0
+    minimum_inclusive: true
+    maximum: 1.0
+    maximum_inclusive: true
+  day_of_week:
+    minimum: 0
+    minimum_inclusive: true
+    maximum: 6
+    maximum_inclusive: true
+  hour_of_day:
+    minimum: 0
+    minimum_inclusive: true
+    maximum: 23
+    maximum_inclusive: true
+
+physical_consistency:
+  speed_formula: "3.6 * route_distance_m / duration_seconds"
+  relative_tolerance: 0.02
+  impossible_speed_threshold_kph: 130.0
+
+leakage_rules:
+  derived_average_speed_kph:
+    direct_components: [route_distance_m, duration_seconds]
+    reason: Derived speed is a deterministic function of distance and duration.
+  time_of_day:
+    direct_components: [hour_of_day]
+    reason: Coarse time-of-day is derived directly from hour.
+  cross_week:
+    direct_components: [origin_week, destination_week]
+    reason: Cross-week status is derived from the two week fields.
+
+privacy_distance_features:
+  continuous:
+    - duration_seconds
+    - route_distance_m
+    - derived_average_speed_kph
+  categorical:
+    - origin_camera
+    - destination_camera
+    - day_of_week
+    - hour_of_day
+    - predominant_road_class
+
+rare_combination_features:
+  - origin_camera
+  - destination_camera
+  - hour_of_day

@@ -1,0 +1,89 @@
+config_version: "1.0.0"
+random_seed: 20260718
+candidate_provenance: generated_from_authorised_train
+validation_mode: strict
+
+sampling:
+  maximum_rows_per_role: 50000
+  method: uniform_without_replacement
+  batch_size: 65536
+  memory_limit_mb: 2048
+  dependency_maximum_rows: 12000
+  propensity_maximum_rows_per_class: 10000
+  utility_maximum_rows_per_role: 20000
+  privacy_maximum_rows_per_role: 2000
+  record_index_digest: true
+
+continuous:
+  quantiles: [0.05, 0.25, 0.5, 0.75, 0.95]
+  histogram_bins: auto_fd
+  maximum_histogram_bins: 80
+  normalisation: holdout_iqr
+
+categorical:
+  top_k: 10
+
+dependency:
+  mutual_information_pairs:
+    - [duration_seconds, route_distance_m]
+    - [duration_seconds, derived_average_speed_kph]
+    - [hour_of_day, time_of_day]
+    - [origin_camera, destination_camera]
+  numeric_bin_count: 10
+  propensity_iterations: 300
+  propensity_learning_rate: 0.1
+
+utility:
+  include_trts_diagnostic: true
+  classifier: nearest_centroid
+  ridge_alpha: 1.0
+  tasks:
+    - name: road_class_from_movement
+      target: predominant_road_class
+      type: classification
+      features:
+        - duration_seconds
+        - route_distance_m
+        - derived_average_speed_kph
+        - origin_confidence
+        - destination_confidence
+        - route_average_kph
+        - direction_compatibility
+        - day_of_week
+        - hour_of_day
+      minimum_class_count: 10
+
+privacy:
+  nearest_neighbour_chunk_size: 128
+  rare_combination_maximum_count: 10
+  attribute_inference_tasks:
+    - target: predominant_road_class
+      known_features: [duration_seconds, route_distance_m, derived_average_speed_kph, hour_of_day]
+
+transport:
+  top_k_od: 20
+  minimum_released_od_count: 10
+  speed_consistency_relative_tolerance: 0.02
+  impossible_speed_threshold_kph: 130.0
+
+uncertainty:
+  bootstrap_repetitions: 200
+  confidence_level: 0.95
+  bootstrap_seed: 20260719
+  selected_metrics:
+    - continuous.normalised_wasserstein.mean
+    - categorical.total_variation.mean
+    - transport.od_pair_jsd
+    - privacy.train_holdout_distance_ratio.median
+
+reporting:
+  include_feature_level_results: true
+  include_not_applicable: true
+  write_row_level_data: false
+  forbidden_output_path_components:
+    - restricted
+    - raw
+    - source_data
+    - vehicle_tokens
+  suppress_low_count_labels: true
+  release_minimum_cell_count: 10
