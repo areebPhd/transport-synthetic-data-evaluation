@@ -1,0 +1,7 @@
+role,code,severity,message,column,affected_count
+synthetic,candidate_provenance_declared,info,Candidate provenance: generated_from_authorised_train,,
+real_train,schema_validation_passed,info,All declared input checks passed,,
+real_holdout,schema_validation_passed,info,All declared input checks passed,,
+synthetic,schema_validation_passed,info,All declared input checks passed,,
+real_train+real_holdout,overlap_key_not_available,info,No governance-approved overlap key was supplied; external split audit is required,,
+all_roles,configured_memory_limit_passed,info,Projected evaluation frames remain within the configured memory limit,,337297.0
